@@ -25,7 +25,7 @@ app.post("/generate-pdf", async (req, res) => {
     const page = await browser.newPage();
 
     console.log("Setting minimal page content...");
-    const { title } = req.body; // Retrieve data from the POST body (optional)
+    const { title } = req.body; // Retrieve data from the POST body
     const htmlContent = `
       <html>
       <head>
@@ -50,13 +50,12 @@ app.post("/generate-pdf", async (req, res) => {
 
     // Convert PDF buffer to Base64
     const base64Pdf = pdfBuffer.toString("base64");
-    console.log("Base64 PDF Preview:", base64Pdf.substring(0, 100)); // Log the first 100 characters for debugging
+    console.log("Base64 PDF Preview:", base64Pdf.substring(0, 100));
 
-    // Send the Base64 string as the response
     res.setHeader("Content-Type", "application/json");
-    res.status(200).json(base64Pdf);
+    res.status(200).json({ base64Pdf });
   } catch (error) {
-    console.error("Error during PDF generation:", error);
+    console.error("Error during PDF generation:", error.message);
     res.status(500).send("An error occurred while generating the PDF.");
   }
 });
