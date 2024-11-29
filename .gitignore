@@ -1,0 +1,54 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Binaries
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Puppeteer Chromium cache
+puppeteer/.local-chromium/
+.cache/
+
+# PDF files
+*.pdf
+
+# Build output
+out/
+tmp/
+temp/
+
+# Coverage directory used by testing tools
+coverage/
+
+# Compiled JavaScript files
+*.tsbuildinfo
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# IDE or Editor specific files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+.DS_Store
