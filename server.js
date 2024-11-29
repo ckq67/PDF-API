@@ -4,13 +4,19 @@ const cors = require("cors");
 
 const app = express();
 
-// Enable CORS
 app.use(cors());
-app.use(express.json()); // Middleware to parse JSON request bodies
+app.use(express.json());
+
+// Determine the environment
+const IS_RENDER = process.env.RENDER === "true";
+const PORT = IS_RENDER ? 10001 : 3000;
 
 app.post("/generate-pdf", async (req, res) => {
   try {
-    console.log("Launching Puppeteer...");
+    console.log(
+      `Launching Puppeteer in ${IS_RENDER ? "Render" : "local"} environment...`
+    );
+
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -25,7 +31,7 @@ app.post("/generate-pdf", async (req, res) => {
     const page = await browser.newPage();
 
     console.log("Setting minimal page content...");
-    const { title } = req.body; // Retrieve data from the POST body
+    const { title } = req.body;
     const htmlContent = `
       <html>
       <head>
@@ -50,17 +56,11 @@ app.post("/generate-pdf", async (req, res) => {
 
     // Convert PDF buffer to Base64
     const base64Pdf = pdfBuffer.toString("base64");
-    console.log("Base64 PDF Preview:", base64Pdf.substring(0, 100));
-
-    res.setHeader("Content-Type", "application/json");
     res.status(200).json({ base64Pdf });
   } catch (error) {
-    console.error("Error during PDF generation:", error.message);
-    res.status(500).send("An error occurred while generating the PDF.");
+    console.error("Error during PDF generation:", error);
+    res.status(500).send("Failed to generate PDF.");
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
