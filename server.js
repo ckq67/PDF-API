@@ -1,9 +1,14 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
+const cors = require("cors");
 
 const app = express();
 
-app.get("/generate-pdf", async (req, res) => {
+// Enable CORS
+app.use(cors());
+app.use(express.json()); // Middleware to parse JSON request bodies
+
+app.post("/generate-pdf", async (req, res) => {
   try {
     console.log("Launching Puppeteer...");
     const browser = await puppeteer.launch({
@@ -20,6 +25,7 @@ app.get("/generate-pdf", async (req, res) => {
     const page = await browser.newPage();
 
     console.log("Setting minimal page content...");
+    const { title } = req.body; // Retrieve data from the POST body (optional)
     const htmlContent = `
       <html>
       <head>
@@ -29,7 +35,7 @@ app.get("/generate-pdf", async (req, res) => {
         </style>
       </head>
       <body>
-        <h1>Hello, Puppeteer!</h1>
+        <h1>${title || "Hello, Puppeteer!"}</h1>
       </body>
       </html>
     `;
@@ -42,13 +48,13 @@ app.get("/generate-pdf", async (req, res) => {
 
     await browser.close();
 
-    // Set response headers
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'attachment; filename="test.pdf"');
-    res.setHeader("Content-Length", pdfBuffer.length);
+    // Convert PDF buffer to Base64
+    const base64Pdf = pdfBuffer.toString("base64");
+    console.log("Base64 PDF Preview:", base64Pdf.substring(0, 100)); // Log the first 100 characters for debugging
 
-    // Send the PDF data as the response
-    res.send(pdfBuffer);
+    // Send the Base64 string as the response
+    res.setHeader("Content-Type", "application/json");
+    res.status(200).json(base64Pdf);
   } catch (error) {
     console.error("Error during PDF generation:", error);
     res.status(500).send("An error occurred while generating the PDF.");
